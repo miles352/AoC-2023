@@ -11,7 +11,7 @@ public class MyClass
         Scanner file = new Scanner(new File("input.txt"));
         int totalSums = 0;
         
-        final String[] numTexts = new String[]{"one", "two", "three", "four", "five", "six", "seven", "eight", "nine"};
+        final String[] numTexts = {"one", "two", "three", "four", "five", "six", "seven", "eight", "nine"};
         
         while (file.hasNextLine())
         {

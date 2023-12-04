@@ -1,7 +1,10 @@
 import java.io.File;
 import java.io.IOException;
 import java.util.Scanner;
+import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.ArrayList;
+import java.util.HashSet;
 
 public class Part2 {
     public static void main(String[] args) throws IOException
@@ -10,68 +13,74 @@ public class Part2 {
 
         ArrayList<String> schematic = new ArrayList<String>();
 
-        int sumOfParts = 0;
+        int gearRatioSum = 0;
 
         // create schematic
+        // surround it with .'s to make things easier
         while (file.hasNextLine())
         {
-            schematic.add(file.nextLine());
+            schematic.add("." + file.nextLine() + ".");
         }
+        schematic.add(0, ".".repeat(schematic.get(0).length()));
+        schematic.add(".".repeat(schematic.get(0).length()));
 
         for (int i = 0; i < schematic.size(); i++)
         {
             String line = schematic.get(i);
             for (int j = 0; j < line.length(); j++)
             {
-                if (Character.isDigit(line.charAt(j)))
-                {
-                    // kinda pointless as numbers length doesnt exceed 3 
-                    int numLength = 1;    
-                    while (j + numLength < line.length() && Character.isDigit(line.charAt(j + numLength)))
+                if (line.charAt(j) == '*')
+                { 
+                    ArrayList<Integer> numbersFound = new ArrayList<Integer>();
+                    int lastLookedLine = -1;
+                    for (int a = -1; a < 2; a++)
                     {
-                        numLength++;
-                        if (i == 58)
+                        for (int b = -1; b < 2; b++)
                         {
-                            System.out.printf("i: %d, j: %d, numLength: %d, Partial: %s%n", i, j, numLength, line.substring(j, j + numLength));
+                            if (Character.isDigit(schematic.get(i + a).charAt(j + b)))
+                            {
+                                int number = getWholeNumber(schematic, i + a, j + b);
+
+                                if (numbersFound.size() > 0 && lastLookedLine == a && Character.isDigit(schematic.get(i + a).charAt(j + b - 1)) && getWholeNumber(schematic, i + a, j + b - 1) == numbersFound.get(numbersFound.size() - 1))
+                                {
+
+                                }
+                                else
+                                {
+                                    numbersFound.add(number);
+                                }
+                                lastLookedLine = a;     
+                            }
                         }
-                        
                     }
-                    int number = Integer.parseInt(line.substring(j, j + numLength));
-                    
-                    for (int k = 0; k < numLength; k++)
+                    if (numbersFound.size() == 2)
                     {
-                        if (j != 0 && k == 0 && line.charAt(j + k - 1) != '.' // left side
-                            || (j + k != line.length() - 1 && k == numLength - 1 && line.charAt(j + k + 1) != '.') // right side
-                            || (i != 0 && schematic.get(i - 1).charAt(j + k) != '.') // top side
-                            || (i != schematic.size() - 1 && schematic.get(i + 1).charAt(j + k) != '.') // bottom side
-                            || (i != 0 && j != 0 && schematic.get(i - 1).charAt(j + k - 1) != '.') // top left
-                            || (i != 0 && j + k != line.length() - 1 && schematic.get(i - 1).charAt(j + k + 1) != '.') // top right
-                            || (i != schematic.size() - 1 && j != 0 && schematic.get(i + 1).charAt(j + k - 1) != '.') // bottom left
-                            || (i != schematic.size() - 1 && j + k != line.length() - 1 && schematic.get(i + 1).charAt(j + k + 1) != '.')) // bottom right
-                            {
-                                sumOfParts += number;
-
-                                if (j != 0 && k == 0 && line.charAt(j + k - 1) != '.' // left side
-                            || (j + k != line.length() - 1 && k == numLength - 1 && line.charAt(j + k + 1) != '.') // right side
-                            || (i != 0 && schematic.get(i - 1).charAt(j + k) != '.') // top side
-                            || (i != schematic.size() - 1 && schematic.get(i + 1).charAt(j + k) != '.') // bottom side
-                            || (i != 0 && j != 0 && schematic.get(i - 1).charAt(j + k - 1) != '.') // top left
-                            || (i != 0 && j + k != line.length() - 1 && schematic.get(i - 1).charAt(j + k + 1) != '.') // top right
-                            || (i != schematic.size() - 1 && j != 0 && schematic.get(i + 1).charAt(j + k - 1) != '.') // bottom left
-                            || (i != schematic.size() - 1 && j + k != line.length() - 1 && schematic.get(i + 1).charAt(j + k + 1) != '.')) // bottom right
-                            {
-                                
-                            }
-
-                                break;
-                            }
+                        gearRatioSum += numbersFound.get(0) * numbersFound.get(1);
                     }
-
-                    // kinda hacky but it works
-                    j += numLength;
                 }
             }
         }
-        System.out.printf("Sum of parts: %d%n", sumOfParts);
+        System.out.printf("Sum of gear ratios: %d%n", gearRatioSum);
+    }
+
+    private static int getWholeNumber(ArrayList<String> schematic, int line, int linePos)
+    {
+        String number = Character.toString(schematic.get(line).charAt(linePos));
+
+        String lineOfNumber = schematic.get(line);
+        int q = 1;
+        while (Character.isDigit(schematic.get(line).charAt(linePos + q)))
+        {
+            number += lineOfNumber.charAt(linePos + q);
+            q++;
+        }
+        q = 1;
+        while (Character.isDigit(lineOfNumber.charAt(linePos - q)))
+        {
+            number = lineOfNumber.charAt(linePos - q) + number;
+            q++;
+        }
+
+        return Integer.parseInt(number);
     }
 }

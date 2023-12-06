@@ -2,8 +2,6 @@ import java.util.Scanner;
 import java.util.ArrayList;
 import java.io.File;
 import java.io.IOException;
-import java.util.stream.LongStream;
-import java.util.Arrays;
 import java.util.Collections;
 
 public class Part1 

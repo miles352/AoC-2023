@@ -4,7 +4,7 @@ import java.util.Scanner;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class Part2
+public class Part1
 {
     public static void main(String[] args) throws IOException
     {
@@ -23,44 +23,32 @@ public class Part2
             grid[i] = ('.' + line + '.').toCharArray();
         }
         grid[length - 1] = ".".repeat(length).toCharArray();
-        int[][] next = getNext(grid, startingPos);
-        int[] L = startingPos;
-        int[] nextL = next[0];
-        int[] R = startingPos;
-        int[] nextR = next[1];
+        int[] next = getNext(grid, startingPos)[0];
+        int[] curr = startingPos;
         int distance = 1;
-        // get each next value until they are equal
-        while (!Arrays.equals(nextL, nextR))
+        // get each next value until you are back to S
+        while (true)
         {
-            // left side
-            int[][] tempNext = getNext(grid, nextL);
+            int[][] tempNext = getNext(grid, next);
             // continue in same direction
-            if (Arrays.equals(tempNext[0], L))
+            if (Arrays.equals(tempNext[0], curr))
             {
-                L = nextL;
-                nextL = tempNext[1];
+                curr = next;
+                next = tempNext[1];
             }
             else
             {
-                L = nextL;
-                nextL = tempNext[0];
+                curr = next;
+                next = tempNext[0];
             }
-
-            // right side
-            tempNext = getNext(grid, nextR);
-            if (Arrays.equals(tempNext[0], R))
-            {
-                R = nextR;
-                nextR = tempNext[1];
-            }
-            else
-            {
-                R = nextR;
-                nextR = tempNext[0];
-            }
+            
             distance++;
+            if (grid[next[0]][next[1]] == 'S')
+            {
+                break;
+            } 
         }
-        System.out.printf("Distance: %d%n", distance);
+        System.out.printf("Distance: %d%n", distance / 2);
     }
 
     public static int[][] getNext(char[][] grid, int[] start)
@@ -73,10 +61,10 @@ public class Part2
         char right = grid[y][x + 1];
         char bottom = grid[y + 1][x];
         char left = grid[y][x - 1];
-        if (startPipe != '-' && startPipe != '7' && startPipe != 'F' && (top == '|' || top == '7' || top == 'F')) connected.add(new int[]{y - 1, x});
-        if (startPipe != '|' && startPipe != 'J' && startPipe != '7' && (right == '-' || right == 'J' || right == '7')) connected.add(new int[]{y, x + 1});
-        if (startPipe != '-' && startPipe != 'L' && startPipe != 'J' && (bottom == '|' || bottom == 'L' || bottom == 'J')) connected.add(new int[]{y + 1, x});
-        if (startPipe != '|' && startPipe != 'L' && startPipe != 'F' && (left == '-' || left == 'L' || left == 'F')) connected.add(new int[]{y, x - 1});
+        if (startPipe != '-' && startPipe != '7' && startPipe != 'F' && (top == '|' || top == '7' || top == 'F' || top == 'S')) connected.add(new int[]{y - 1, x});
+        if (startPipe != '|' && startPipe != 'J' && startPipe != '7' && (right == '-' || right == 'J' || right == '7' || right == 'S')) connected.add(new int[]{y, x + 1});
+        if (startPipe != '-' && startPipe != 'L' && startPipe != 'J' && (bottom == '|' || bottom == 'L' || bottom == 'J' || bottom == 'S')) connected.add(new int[]{y + 1, x});
+        if (startPipe != '|' && startPipe != 'L' && startPipe != 'F' && (left == '-' || left == 'L' || left == 'F' || left == 'S')) connected.add(new int[]{y, x - 1});
         return connected.stream().toArray(int[][]::new);
     }
 }
